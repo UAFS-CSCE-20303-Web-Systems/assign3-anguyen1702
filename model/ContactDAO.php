@@ -21,6 +21,42 @@
             $connection->close();
         }
 
+        public function updateContact($contact){
+            $connection=$this->getConnection();
+            $stmt = $connection->prepare("UPDATE contacts SET username = ?, email = ? WHERE contactID = ?");
+            $stmt->bind_param("ssi", $contact->username, $contact->email, $contact->contactID);
+            $stmt->execute();
+            $stmt->close();
+            $connection->close();
+        }
+
+        public function deleteContact($contactID){
+            $connection=$this->getConnection();
+            $stmt = $connection->prepare("DELETE FROM contacts WHERE contactID = ?");
+            $stmt->bind_param("i", $contactID);
+            $stmt->execute();
+            $stmt->close();
+            $connection->close();
+        }
+
+        public function getContacts1($contactID){
+            $connection=$this->getConnection();
+            $stmt = $connection->prepare("SELECT * FROM contacts WHERE contactID = ?"); 
+            $stmt->bind_param("i", $contactID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $contact = null;
+            while($row = $result->fetch_assoc()){
+                $contact = new Contact();
+                $contact->load($row);
+                //$contacts[]=$contact;
+            }    
+            $stmt->close();
+            $connection->close();
+            return $contact;
+        }
+
         public function getContacts(){
             $connection=$this->getConnection();
             $stmt = $connection->prepare("SELECT * FROM contacts;"); 
